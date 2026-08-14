@@ -8,7 +8,7 @@ CONFIG_URL = "https://github.com/lsst-ts/ts_config_scheduler/blob/develop/Schedu
 DDF_URL_BASE = "https://s3df.slac.stanford.edu/data/rubin/sim-data/ddf_arrays/"
 
 
-def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE):
+def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE, trim=True):
     """
     Get the current DDF schedule.
 
@@ -18,6 +18,8 @@ def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE):
         URL where the current telescope configuration can be found.
     DDF_URL_BASE : `str`
         The base URL for where ddf .npz files are stored.
+    trim : `bool`
+        If True, trim off columns that have no meaningful information set.
 
     Returns
     -------
@@ -51,5 +53,14 @@ def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE):
     ddf_load = np.load(ddf_array_file)
     obs_array = ddf_load["obs_array"]
     ddf_load.close()
+
+    if trim:
+        cols = obs_array.dtype.names
+        keep_cols = ["HA_min", "HA_max", "exptime", "RA", "dec", "mjd"]
+        for col in cols:
+            if np.size(np.unique(obs_array[col])) > 1:
+                keep_cols.append(col)
+        keep_cols = list(set(keep_cols))
+        obs_array = obs_array[keep_cols]
 
     return obs_array
