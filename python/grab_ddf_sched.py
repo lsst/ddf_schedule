@@ -56,11 +56,15 @@ def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE, trim=
 
     if trim:
         cols = obs_array.dtype.names
+        # Columns to keep no matter what
         keep_cols = ["HA_min", "HA_max", "exptime", "RA", "dec", "mjd"]
         for col in cols:
+            # Check for other columns that have different values
+            # to also keep
             if np.size(np.unique(obs_array[col])) > 1:
                 keep_cols.append(col)
         keep_cols = list(set(keep_cols))
+        # Chop array down to only keep_cols
         obs_array = obs_array[keep_cols]
 
     return obs_array
