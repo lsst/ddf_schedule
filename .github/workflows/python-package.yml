@@ -4,6 +4,9 @@
 name: Python package
 
 on:
+  # Run job at the end of each day
+  schedule:
+      - cron: "0 0 * * *"
   push:
     branches: [ "main" ]
   pull_request:
