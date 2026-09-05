@@ -8,7 +8,12 @@ CONFIG_URL = "https://github.com/lsst-ts/ts_config_scheduler/blob/develop/Schedu
 DDF_URL_BASE = "https://s3df.slac.stanford.edu/data/rubin/sim-data/ddf_arrays/"
 
 
-def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE, trim=True):
+def grab_ddf_sched(
+    config_url=CONFIG_URL,
+    ddf_array_url_base=DDF_URL_BASE,
+    hash_overide={"d434bca": "8b042bc"},
+    trim=True,
+):
     """
     Get the current DDF schedule.
 
@@ -18,6 +23,9 @@ def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE, trim=
         URL where the current telescope configuration can be found.
     DDF_URL_BASE : `str`
         The base URL for where ddf .npz files are stored.
+    hash_overide : `dict`
+        If there is a hash being used on the sumit that is planned to
+        be replaced, can set it as a key with the overide hash as a value.
     trim : `bool`
         If True, trim off columns that have no meaningful information set.
 
@@ -25,6 +33,9 @@ def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE, trim=
     -------
     numpy array with the information for each scheduled DDF visit
     """
+
+    if hash_overide is None:
+        hash_overide = {}
 
     # Grab the config page from github
     config_page = requests.get(config_url)
@@ -37,6 +48,9 @@ def grab_ddf_sched(config_url=CONFIG_URL, ddf_array_url_base=DDF_URL_BASE, trim=
         .decode()
         .replace("\\", "")
     )
+
+    if hex_str in hash_overide.keys():
+        hex_str = hash_overide[hex_str]
 
     ddf_array_file = "ts_ddf_array_%s.npz" % hex_str
     url = ddf_array_url_base + ddf_array_file
