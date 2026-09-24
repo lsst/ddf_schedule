@@ -11,7 +11,7 @@ DDF_URL_BASE = "https://s3df.slac.stanford.edu/data/rubin/sim-data/ddf_arrays/"
 def grab_ddf_sched(
     config_url=CONFIG_URL,
     ddf_array_url_base=DDF_URL_BASE,
-    hash_overide={"d434bca": "8b042bc"},
+    hash_overide={"39563ad": "8b042bc"},
     trim=True,
 ):
     """
