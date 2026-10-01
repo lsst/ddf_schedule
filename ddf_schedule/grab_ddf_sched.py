@@ -55,13 +55,21 @@ def grab_ddf_sched(
     ddf_array_file = "ts_ddf_array_%s.npz" % hex_str
     url = ddf_array_url_base + ddf_array_file
 
-    # Download the file
+    # Download the file if needed
     if not os.path.isfile(ddf_array_file):
-        print("Downloading %s" % url)
-        response = requests.get(url, stream=True, timeout=30)
-        with open(ddf_array_file, "wb") as f:
-            f.write(response.content)
+        try:
+            print("Downloading %s" % url)
+            response = requests.get(url, stream=True, timeout=30)
+            with open(ddf_array_file, "wb") as f:
+                f.write(response.content)
+        except:
+            usfd_path = "/sdf/group/rubin/web_data/sim-data/ddf_arrays"
+            msg = "Failed to download %s. " % url
+            msg += "Ask survey strategy team to make"
+            msg += " file available at usdf in %s" % usfd_path
+            print(msg)
     else:
+        # File already exists, use local file
         print("Using file %s" % ddf_array_file)
 
     ddf_load = np.load(ddf_array_file)
